@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.example.denx7.popularmovies.model.PopularMovies;
 import com.example.denx7.popularmovies.model.Result;
@@ -32,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
     @BindView(R.id.movies)
     RecyclerView recyclerView;
     ArrayList<Result> listMovies;
+    @BindView(R.id.progress_load_movies)
+    ProgressBar progressBarLoadMovies;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +83,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
      * load popular movies
      */
     public void getPopularMovieList() {
+        progressBarLoadMovies.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.INVISIBLE);
         restClient.getPopularMoviesList(1).enqueue(new Callback<PopularMovies>() {
             @Override
             public void onResponse(Call<PopularMovies> call, Response<PopularMovies> response) {
@@ -91,6 +96,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
 
                 adapter = new MoviesAdapter(MainActivity.this, popularMoviesPosterPath);
                 adapter.setClickListener(MainActivity.this);
+                progressBarLoadMovies.setVisibility(View.INVISIBLE);
+                recyclerView.setVisibility(View.VISIBLE);
                 recyclerView.setAdapter(adapter);
             }
 
@@ -105,6 +112,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
      * load top rated movies
      */
     public void getTopRatedMovieList() {
+        progressBarLoadMovies.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.INVISIBLE);
         restClient.getTopRatedMoviesList(1).enqueue(new Callback<PopularMovies>() {
             @Override
             public void onResponse(Call<PopularMovies> call, Response<PopularMovies> response) {
@@ -116,6 +125,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
 
                 adapter = new MoviesAdapter(MainActivity.this, topRatedMoviesPosterPath);
                 adapter.setClickListener(MainActivity.this);
+                progressBarLoadMovies.setVisibility(View.INVISIBLE);
+                recyclerView.setVisibility(View.VISIBLE);
                 recyclerView.setAdapter(adapter);
             }
 

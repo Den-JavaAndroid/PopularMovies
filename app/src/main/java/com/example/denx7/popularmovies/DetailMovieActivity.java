@@ -22,6 +22,12 @@ public class DetailMovieActivity extends AppCompatActivity {
     @BindView(R.id.movie_poster)
      ImageView moviePoster;
 
+    @BindView(R.id.release_date)
+    TextView releaseDateTxv;
+
+    @BindView(R.id.rating)
+    TextView ratingTxv;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +45,8 @@ public class DetailMovieActivity extends AppCompatActivity {
 
         movieName.setText(result.getOriginalTitle());
         movieOverview.setText(result.getOverview());
+        releaseDateTxv.setText(result.getReleaseDate());
+        ratingTxv.setText(result.getVoteAverage().toString());
     }
 
     @Override
