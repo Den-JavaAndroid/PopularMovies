@@ -1,7 +1,9 @@
 package com.example.denx7.popularmovies;
 
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,6 +25,12 @@ public class DetailMovieActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActionBar actionBar = this.getSupportActionBar();
+        // Set the action bar back button to look like an up button
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
         setContentView(R.layout.activity_detail_movie);
         ButterKnife.bind(this);
         Result result = (Result) getIntent().getSerializableExtra("MovieInfo");
@@ -31,7 +39,13 @@ public class DetailMovieActivity extends AppCompatActivity {
 
         movieName.setText(result.getOriginalTitle());
         movieOverview.setText(result.getOverview());
+    }
 
-
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

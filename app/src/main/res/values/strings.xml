@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">PopularMovies</string>
+    <string name="action_settings">Settings</string>
+    <string name="sort_by_title">Sort By</string>
+    <string name="popular">popular</string>
+    <string name="rating">rating</string>
+    <string name="sort_by_key">sortBy</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>
