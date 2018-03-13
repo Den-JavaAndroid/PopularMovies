@@ -2,6 +2,7 @@ package com.example.denx7.popularmovies.retrofit;
 
 
 
+import com.example.denx7.popularmovies.BuildConfig;
 import com.example.denx7.popularmovies.model.PopularMovies;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -13,8 +14,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RestClient {
 
-    static final String BASE_URL = "https://api.themoviedb.org/";
-    private static final String API_KEY = "63fa33737e8d3c8593b7e5ef91e0c3dc";
+    private static final String BASE_URL = "https://api.themoviedb.org/";
+    private static final String API_KEY = BuildConfig.API_KEY;
     private Retrofit retrofit;
     private Gson gson;
     private ThemoviedbApi themoviedbApi;
