@@ -16,16 +16,14 @@ public class RestClient {
 
     private static final String BASE_URL = "https://api.themoviedb.org/";
     private static final String API_KEY = BuildConfig.API_KEY;
-    private Retrofit retrofit;
-    private Gson gson;
-    private ThemoviedbApi themoviedbApi;
+    private final ThemoviedbApi themoviedbApi;
 
     public RestClient() {
-        gson = new GsonBuilder()
+        Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
 
-        retrofit = new Retrofit.Builder()
+        Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();

@@ -16,11 +16,11 @@ import butterknife.ButterKnife;
 public class DetailMovieActivity extends AppCompatActivity {
 
     @BindView(R.id.movie_title)
-     TextView movieName;
+    TextView movieName;
     @BindView(R.id.overview)
-     TextView movieOverview;
+    TextView movieOverview;
     @BindView(R.id.movie_poster)
-     ImageView moviePoster;
+    ImageView moviePoster;
 
     @BindView(R.id.release_date)
     TextView releaseDateTxv;

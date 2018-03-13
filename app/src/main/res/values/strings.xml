@@ -7,6 +7,9 @@
     <string name="sort_by_key">sortBy</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="release_date">Release Date:</string>
+    <string name="rating_txv">Rating:</string>
+    <string name="overview">Overview</string>
+    <string name="movie_poster">Movie poster</string>
 
 </resources>

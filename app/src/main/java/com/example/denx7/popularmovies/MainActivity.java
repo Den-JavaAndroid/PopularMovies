@@ -28,11 +28,11 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements MoviesAdapter.ItemClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
-    MoviesAdapter adapter;
-    RestClient restClient;
+    private MoviesAdapter adapter;
+    private RestClient restClient;
     @BindView(R.id.movies)
     RecyclerView recyclerView;
-    ArrayList<Result> listMovies;
+    private ArrayList<Result> listMovies;
     @BindView(R.id.progress_load_movies)
     ProgressBar progressBarLoadMovies;
 
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
     }
 
 
-    public void loadMoviesSortedByPreference(SharedPreferences sharedPreferences) {
+    private void loadMoviesSortedByPreference(SharedPreferences sharedPreferences) {
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         String sortBy = sharedPreferences.getString(getString(R.string.sort_by_key), getString(R.string.popular));
         if (sortBy.equals(getString(R.string.popular))) getPopularMovieList();
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
     /**
      * load popular movies
      */
-    public void getPopularMovieList() {
+    private void getPopularMovieList() {
         progressBarLoadMovies.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.INVISIBLE);
         restClient.getPopularMoviesList(1).enqueue(new Callback<PopularMovies>() {
@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
     /**
      * load top rated movies
      */
-    public void getTopRatedMovieList() {
+    private void getTopRatedMovieList() {
         progressBarLoadMovies.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.INVISIBLE);
         restClient.getTopRatedMoviesList(1).enqueue(new Callback<PopularMovies>() {

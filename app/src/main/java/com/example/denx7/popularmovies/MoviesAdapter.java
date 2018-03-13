@@ -11,15 +11,12 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-/**
- * Created by denx7 on 08.03.2018.
- */
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder> {
-    private LayoutInflater mInflater;
-    private ArrayList<String> moviePosterPaths;
+    private final LayoutInflater mInflater;
+    private final ArrayList<String> moviePosterPaths;
     private ItemClickListener mClickListener;
-    Context context;
+    private final Context context;
 
     // data is passed into the constructor
     MoviesAdapter(Context context, ArrayList<String> moviePosterPaths) {
@@ -46,7 +43,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        ImageView imageView;
+        final ImageView imageView;
 
         public ViewHolder(View itemView) {
             super(itemView);
