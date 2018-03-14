@@ -34,7 +34,11 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     @Override
     public void onBindViewHolder(ViewHolder holder, int i) {
         String posterUrl = "http://image.tmdb.org/t/p/w185" + moviePosterPaths.get(i);
-        Picasso.with(context).load(posterUrl).placeholder(R.drawable.movies_placeholder).into(holder.imageView);
+        Picasso.with(context)
+                .load(posterUrl)
+                .placeholder(R.drawable.movies_placeholder)
+                .error(R.drawable.not_found)
+                .into(holder.imageView);
     }
 
     @Override
