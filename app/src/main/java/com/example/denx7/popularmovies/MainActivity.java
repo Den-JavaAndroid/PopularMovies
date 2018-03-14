@@ -42,8 +42,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
         restClient = new RestClient();
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        int numberOfColumns = 2;
-        recyclerView.setLayoutManager(new GridLayoutManager(this, numberOfColumns));
+        recyclerView.setLayoutManager(new GridAutofitLayoutManager(this, 400));
 
         //load movies if internet connected
         if (NetworkUtils.isOnline(this))
@@ -147,13 +146,11 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(getString(R.string.sort_by_key)))
-        {
+        if (key.equals(getString(R.string.sort_by_key))) {
             loadMoviesSortedByPreference(sharedPreferences);
         }
 
     }
-
 
 
     @Override
