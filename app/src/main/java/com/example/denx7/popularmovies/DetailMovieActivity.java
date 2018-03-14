@@ -39,7 +39,7 @@ public class DetailMovieActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_detail_movie);
         ButterKnife.bind(this);
-        Result result = (Result) getIntent().getSerializableExtra("MovieInfo");
+        Result result = getIntent().getParcelableExtra("MovieInfo");
         String posterUrl = "http://image.tmdb.org/t/p/w500" + result.getBackdropPath();
         Picasso.with(this)
                 .load(posterUrl)
