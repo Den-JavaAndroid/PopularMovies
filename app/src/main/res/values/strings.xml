@@ -11,5 +11,6 @@
     <string name="rating_txv">Rating:</string>
     <string name="overview">Overview</string>
     <string name="movie_poster">Movie poster</string>
+    <string name="favorite">favorite</string>
 
 </resources>

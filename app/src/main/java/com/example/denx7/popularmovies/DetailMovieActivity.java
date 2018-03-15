@@ -39,18 +39,20 @@ public class DetailMovieActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_detail_movie);
         ButterKnife.bind(this);
-        Result result = getIntent().getParcelableExtra("MovieInfo");
-        String posterUrl = "http://image.tmdb.org/t/p/w500" + result.getBackdropPath();
-        Picasso.with(this)
-                .load(posterUrl)
-                .placeholder(R.drawable.movies_placeholder)
-                .error(R.drawable.not_found)
-                .into(moviePoster);
+        if(getIntent() != null) {
+            Result result = getIntent().getParcelableExtra("MovieInfo");
+            String posterUrl = "http://image.tmdb.org/t/p/w500" + result.getBackdropPath();
+            Picasso.with(this)
+                    .load(posterUrl)
+                    .placeholder(R.drawable.movies_placeholder)
+                    .error(R.drawable.not_found)
+                    .into(moviePoster);
 
-        movieName.setText(result.getOriginalTitle());
-        movieOverview.setText(result.getOverview());
-        releaseDateTxv.setText(result.getReleaseDate());
-        ratingTxv.setText(result.getVoteAverage().toString());
+            movieName.setText(result.getOriginalTitle());
+            movieOverview.setText(result.getOverview());
+            releaseDateTxv.setText(result.getReleaseDate());
+            ratingTxv.setText(result.getVoteAverage().toString());
+        }
     }
 
     @Override

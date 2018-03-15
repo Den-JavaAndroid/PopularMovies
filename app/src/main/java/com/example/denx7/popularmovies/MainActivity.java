@@ -2,6 +2,8 @@ package com.example.denx7.popularmovies;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.preference.PreferenceManager;
@@ -10,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.denx7.popularmovies.model.PopularMovies;
 import com.example.denx7.popularmovies.model.Result;
@@ -34,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
     private ArrayList<Result> listMovies;
     @BindView(R.id.progress_load_movies)
     ProgressBar progressBarLoadMovies;
+    @BindView(R.id.navigation)
+    BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,11 +48,49 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
         ButterKnife.bind(this);
         recyclerView.setLayoutManager(new GridAutofitLayoutManager(this, 400));
 
+        bottomNavigationView = findViewById(R.id.navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener
+                (new BottomNavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.rating:
+                                loadMoviesSortedByChoose(getString(R.string.rating));
+                                break;
+                            case R.id.popular:
+                                loadMoviesSortedByChoose(getString(R.string.popular));
+                                break;
+                            case R.id.favorite:
+                                Toast.makeText(MainActivity.this, "SORRY, NOT IMPLEMENTED NOW", Toast.LENGTH_SHORT).show();
+                        }
+                        return true;
+                    }
+                });
+
+
         if (savedInstanceState != null) {
             listMovies = savedInstanceState.getParcelableArrayList("MovieInfo");
             setMovies(listMovies);
         } else if (NetworkUtils.isOnline(this))
             loadMoviesSortedByPreference(PreferenceManager.getDefaultSharedPreferences(this));
+
+        //hide bottomNavigationView on scroll recyclerview
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0 || dy < 0 && bottomNavigationView.isShown()) {
+                    bottomNavigationView.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    bottomNavigationView.setVisibility(View.VISIBLE);
+                }
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
 
     }
 
@@ -82,6 +125,13 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
         String sortBy = sharedPreferences.getString(getString(R.string.sort_by_key), getString(R.string.popular));
         if (sortBy.equals(getString(R.string.popular))) getPopularMovieList();
         if (sortBy.equals(getString(R.string.rating))) getTopRatedMovieList();
+    }
+
+    private void loadMoviesSortedByChoose(String sortBy) {
+        if (NetworkUtils.isOnline(this)) {
+            if (sortBy.equals(getString(R.string.popular))) getPopularMovieList();
+            if (sortBy.equals(getString(R.string.rating))) getTopRatedMovieList();
+        }
     }
 
 
