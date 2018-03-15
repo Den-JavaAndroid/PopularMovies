@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.preference.PreferenceManager;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,10 +43,18 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
         ButterKnife.bind(this);
         recyclerView.setLayoutManager(new GridAutofitLayoutManager(this, 400));
 
-        //load movies if internet connected
-        if (NetworkUtils.isOnline(this))
+        if (savedInstanceState != null) {
+            listMovies = savedInstanceState.getParcelableArrayList("MovieInfo");
+            setMovies(listMovies);
+        } else if (NetworkUtils.isOnline(this))
             loadMoviesSortedByPreference(PreferenceManager.getDefaultSharedPreferences(this));
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("MovieInfo", listMovies);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -89,15 +96,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
             public void onResponse(Call<PopularMovies> call, Response<PopularMovies> response) {
                 PopularMovies popularMovies = response.body();
                 listMovies = (ArrayList<Result>) popularMovies.getResults();
-                ArrayList<String> popularMoviesPosterPath = new ArrayList<>();
-                for (Result result : listMovies)
-                    popularMoviesPosterPath.add(result.getPosterPath());
-
-                adapter = new MoviesAdapter(MainActivity.this, popularMoviesPosterPath);
-                adapter.setClickListener(MainActivity.this);
-                progressBarLoadMovies.setVisibility(View.INVISIBLE);
-                recyclerView.setVisibility(View.VISIBLE);
-                recyclerView.setAdapter(adapter);
+                setMovies(listMovies);
             }
 
             @Override
@@ -118,15 +117,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
             public void onResponse(Call<PopularMovies> call, Response<PopularMovies> response) {
                 PopularMovies popularMovies = response.body();
                 listMovies = (ArrayList<Result>) popularMovies.getResults();
-                ArrayList<String> topRatedMoviesPosterPath = new ArrayList<>();
-                for (Result result : listMovies)
-                    topRatedMoviesPosterPath.add(result.getPosterPath());
-
-                adapter = new MoviesAdapter(MainActivity.this, topRatedMoviesPosterPath);
-                adapter.setClickListener(MainActivity.this);
-                progressBarLoadMovies.setVisibility(View.INVISIBLE);
-                recyclerView.setVisibility(View.VISIBLE);
-                recyclerView.setAdapter(adapter);
+                setMovies(listMovies);
             }
 
             @Override
@@ -134,6 +125,19 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
 
             }
         });
+    }
+
+    private void setMovies(ArrayList<Result> listMovies) {
+
+        ArrayList<String> topRatedMoviesPosterPath = new ArrayList<>();
+        for (Result result : listMovies)
+            topRatedMoviesPosterPath.add(result.getPosterPath());
+
+        adapter = new MoviesAdapter(MainActivity.this, topRatedMoviesPosterPath);
+        adapter.setClickListener(MainActivity.this);
+        progressBarLoadMovies.setVisibility(View.INVISIBLE);
+        recyclerView.setVisibility(View.VISIBLE);
+        recyclerView.setAdapter(adapter);
     }
 
 
