@@ -1,5 +1,5 @@
 
-package com.example.denx7.popularmovies.model;
+package com.example.denx7.popularmovies.model.movieinfo;
 
 import java.util.List;
 import com.google.gson.annotations.Expose;

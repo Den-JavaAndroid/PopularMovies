@@ -1,5 +1,5 @@
 
-package com.example.denx7.popularmovies.model;
+package com.example.denx7.popularmovies.model.movieinfo;
 
 import android.os.Parcel;
 import android.os.Parcelable;

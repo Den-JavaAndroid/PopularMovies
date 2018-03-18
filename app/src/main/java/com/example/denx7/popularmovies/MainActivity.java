@@ -14,8 +14,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.denx7.popularmovies.model.PopularMovies;
-import com.example.denx7.popularmovies.model.Result;
+import com.example.denx7.popularmovies.model.movieinfo.PopularMovies;
+import com.example.denx7.popularmovies.model.movieinfo.Result;
 import com.example.denx7.popularmovies.retrofit.RestClient;
 import com.example.denx7.popularmovies.settings.SettingsActivity;
 import com.example.denx7.popularmovies.utils.NetworkUtils;
