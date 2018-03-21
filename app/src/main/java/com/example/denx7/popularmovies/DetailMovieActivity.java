@@ -7,13 +7,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.denx7.popularmovies.model.movieinfo.Result;
+import com.example.denx7.popularmovies.model.reviews.Reviews;
 import com.example.denx7.popularmovies.model.videos.Videos;
 import com.example.denx7.popularmovies.retrofit.RestClient;
 import com.squareup.picasso.Picasso;
@@ -29,10 +29,12 @@ import retrofit2.Response;
 public class DetailMovieActivity extends AppCompatActivity implements VideosAdapter.ItemClickListener {
 
     private RestClient restClient;
-    Result result;
+    Result movieInfo;
     ArrayList<com.example.denx7.popularmovies.model.videos.Result> listVideos;
+    ArrayList<com.example.denx7.popularmovies.model.reviews.Result> listReviews;
     ArrayList<String> listKeysOfVideo = new ArrayList<>();
-    private VideosAdapter adapter;
+    private VideosAdapter videosAdapter;
+    private ReviewsAdapter reviewsAdapter;
 
     @BindView(R.id.movie_title)
     TextView movieName;
@@ -48,7 +50,10 @@ public class DetailMovieActivity extends AppCompatActivity implements VideosAdap
     TextView ratingTxv;
 
     @BindView(R.id.videos)
-    RecyclerView recyclerView;
+    RecyclerView videosRecyclerView;
+
+    @BindView(R.id.reviews)
+    RecyclerView reviewsRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,8 +67,8 @@ public class DetailMovieActivity extends AppCompatActivity implements VideosAdap
         setContentView(R.layout.activity_detail_movie);
         ButterKnife.bind(this);
         if (getIntent() != null) {
-            result = getIntent().getParcelableExtra("MovieInfo");
-            String posterUrl = "http://image.tmdb.org/t/p/w500" + result.getBackdropPath();
+            movieInfo = getIntent().getParcelableExtra("MovieInfo");
+            String posterUrl = "http://image.tmdb.org/t/p/w500" + movieInfo.getBackdropPath();
             Picasso.with(this)
                     .load(posterUrl)
                     .placeholder(R.drawable.movies_placeholder)
@@ -71,14 +76,18 @@ public class DetailMovieActivity extends AppCompatActivity implements VideosAdap
                     .into(moviePoster);
             restClient = new RestClient();
 
-            movieName.setText(result.getOriginalTitle());
-            movieOverview.setText(result.getOverview());
-            releaseDateTxv.setText(result.getReleaseDate());
-            ratingTxv.setText(result.getVoteAverage().toString());
+            movieName.setText(movieInfo.getOriginalTitle());
+            movieOverview.setText(movieInfo.getOverview());
+            releaseDateTxv.setText(movieInfo.getReleaseDate());
+            ratingTxv.setText(movieInfo.getVoteAverage().toString());
 
-//            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-            recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+            //set videos
+            videosRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
             getVideoList();
+
+            //set reviews
+            reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            getReviewList();
 
         }
     }
@@ -95,9 +104,7 @@ public class DetailMovieActivity extends AppCompatActivity implements VideosAdap
      * load videos
      */
     private void getVideoList() {
-//        progressBarLoadMovies.setVisibility(View.VISIBLE);
-//        recyclerView.setVisibility(View.INVISIBLE);
-        restClient.getVideos(result.getId()).enqueue(new Callback<Videos>() {
+        restClient.getVideos(movieInfo.getId()).enqueue(new Callback<Videos>() {
             @Override
             public void onResponse(Call<Videos> call, Response<Videos> response) {
                 Videos videos = response.body();
@@ -106,9 +113,29 @@ public class DetailMovieActivity extends AppCompatActivity implements VideosAdap
                 for (com.example.denx7.popularmovies.model.videos.Result result : listVideos) {
                     listKeysOfVideo.add(result.getKey());
                 }
-                adapter = new VideosAdapter(DetailMovieActivity.this, listKeysOfVideo);
-                adapter.setClickListener(DetailMovieActivity.this);
-                recyclerView.setAdapter(adapter);
+                videosAdapter = new VideosAdapter(DetailMovieActivity.this, listKeysOfVideo);
+                videosAdapter.setClickListener(DetailMovieActivity.this);
+                videosRecyclerView.setAdapter(videosAdapter);
+            }
+
+            @Override
+            public void onFailure(Call call, Throwable t) {
+
+            }
+        });
+    }
+
+    /**
+     * load reviews
+     */
+    private void getReviewList() {
+        restClient.getReviews(movieInfo.getId()).enqueue(new Callback<Reviews>() {
+            @Override
+            public void onResponse(Call<Reviews> call, Response<Reviews> response) {
+                Reviews reviews = response.body();
+                listReviews = (ArrayList<com.example.denx7.popularmovies.model.reviews.Result>) reviews.getResults();
+                reviewsAdapter = new ReviewsAdapter(DetailMovieActivity.this, listReviews);
+                reviewsRecyclerView.setAdapter(reviewsAdapter);
             }
 
             @Override
