@@ -5,6 +5,9 @@ import android.net.Uri;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -23,11 +26,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class DetailMovieActivity extends AppCompatActivity {
+public class DetailMovieActivity extends AppCompatActivity implements VideosAdapter.ItemClickListener {
 
     private RestClient restClient;
     Result result;
     ArrayList<com.example.denx7.popularmovies.model.videos.Result> listVideos;
+    ArrayList<String> listKeysOfVideo = new ArrayList<>();
+    private VideosAdapter adapter;
 
     @BindView(R.id.movie_title)
     TextView movieName;
@@ -41,8 +46,9 @@ public class DetailMovieActivity extends AppCompatActivity {
 
     @BindView(R.id.rating)
     TextView ratingTxv;
-    @BindView(R.id.trailer)
-    ImageView trailerImg;
+
+    @BindView(R.id.videos)
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +76,8 @@ public class DetailMovieActivity extends AppCompatActivity {
             releaseDateTxv.setText(result.getReleaseDate());
             ratingTxv.setText(result.getVoteAverage().toString());
 
+//            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
             getVideoList();
 
         }
@@ -94,22 +102,13 @@ public class DetailMovieActivity extends AppCompatActivity {
             public void onResponse(Call<Videos> call, Response<Videos> response) {
                 Videos videos = response.body();
                 listVideos = (ArrayList<com.example.denx7.popularmovies.model.videos.Result>) videos.getResults();
-                if (listVideos != null && !listVideos.isEmpty()) {
-                    String videoImgUrl = "http://img.youtube.com/vi/" + listVideos.get(0).getKey() + "/0.jpg";
-                    Picasso.with(DetailMovieActivity.this)
-                            .load(videoImgUrl)
-                            .placeholder(R.drawable.movies_placeholder)
-                            .error(R.drawable.not_found)
-                            .into(trailerImg);
 
-                    trailerImg.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            startActivity(new Intent(Intent.ACTION_VIEW,
-                                    Uri.parse(RestClient.BASE_VIDEO_URL + listVideos.get(0).getKey())));
-                        }
-                    });
+                for (com.example.denx7.popularmovies.model.videos.Result result : listVideos) {
+                    listKeysOfVideo.add(result.getKey());
                 }
+                adapter = new VideosAdapter(DetailMovieActivity.this, listKeysOfVideo);
+                adapter.setClickListener(DetailMovieActivity.this);
+                recyclerView.setAdapter(adapter);
             }
 
             @Override
@@ -119,4 +118,9 @@ public class DetailMovieActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onItemClick(View view, int position) {
+        startActivity(new Intent(Intent.ACTION_VIEW,
+                Uri.parse(RestClient.BASE_VIDEO_URL + listKeysOfVideo.get(position))));
+    }
 }

@@ -12,5 +12,6 @@
     <string name="overview">Overview</string>
     <string name="movie_poster">Movie poster</string>
     <string name="favorite">favorite</string>
+    <string name="trailer_poster">trailer poster</string>
 
 </resources>
