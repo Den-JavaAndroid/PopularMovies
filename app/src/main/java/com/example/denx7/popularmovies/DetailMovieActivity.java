@@ -1,5 +1,6 @@
 package com.example.denx7.popularmovies;
 
+import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.ActionBar;
@@ -11,7 +12,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
+import com.example.denx7.popularmovies.data.MovieDatabase;
+import com.example.denx7.popularmovies.data.MovieInfo;
 import com.example.denx7.popularmovies.model.movieinfo.Result;
 import com.example.denx7.popularmovies.model.reviews.Reviews;
 import com.example.denx7.popularmovies.model.videos.Videos;
@@ -55,6 +59,12 @@ public class DetailMovieActivity extends AppCompatActivity implements VideosAdap
     @BindView(R.id.reviews)
     RecyclerView reviewsRecyclerView;
 
+    @BindView(R.id.add_favorite)
+    ToggleButton addFavorite;
+
+
+    MovieDatabase mDb;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +73,7 @@ public class DetailMovieActivity extends AppCompatActivity implements VideosAdap
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        mDb = MovieDatabase.getMovieDatabase(DetailMovieActivity.this);
 
         setContentView(R.layout.activity_detail_movie);
         ButterKnife.bind(this);
@@ -81,6 +92,30 @@ public class DetailMovieActivity extends AppCompatActivity implements VideosAdap
             releaseDateTxv.setText(movieInfo.getReleaseDate());
             ratingTxv.setText(movieInfo.getVoteAverage().toString());
 
+            if (isFavoriteMovie()) {
+                addFavorite.setChecked(true);
+            }
+
+
+            addFavorite.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isFavoriteMovie()) {
+                        mDb.movieInfoDao().deleteMovieInfo(movieInfo.getId());
+                    } else {
+                        MovieInfo movieInfoData = new MovieInfo();
+                        movieInfoData.setId(movieInfo.getId());
+                        movieInfoData.setOverview(movieInfo.getOverview());
+                        movieInfoData.setRating(movieInfo.getVoteAverage());
+                        movieInfoData.setRelease_date(movieInfo.getReleaseDate());
+                        movieInfoData.setTitle(movieInfo.getTitle());
+                        movieInfoData.setPosterPath(movieInfo.getPosterPath());
+                        mDb.movieInfoDao().insertMovieInfo(movieInfoData);
+                    }
+                }
+            });
+
+
             //set videos
             videosRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
             getVideoList();
@@ -89,7 +124,12 @@ public class DetailMovieActivity extends AppCompatActivity implements VideosAdap
             reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
             getReviewList();
 
+
         }
+    }
+
+    private boolean isFavoriteMovie() {
+        return mDb.movieInfoDao().getMovieById(movieInfo.getId()) != null;
     }
 
     @Override

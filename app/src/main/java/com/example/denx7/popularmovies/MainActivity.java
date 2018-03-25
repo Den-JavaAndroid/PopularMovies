@@ -14,6 +14,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.denx7.popularmovies.data.MovieDatabase;
+import com.example.denx7.popularmovies.data.MovieInfo;
 import com.example.denx7.popularmovies.model.movieinfo.PopularMovies;
 import com.example.denx7.popularmovies.model.movieinfo.Result;
 import com.example.denx7.popularmovies.retrofit.RestClient;
@@ -21,6 +23,7 @@ import com.example.denx7.popularmovies.settings.SettingsActivity;
 import com.example.denx7.popularmovies.utils.NetworkUtils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -62,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
                                 break;
                             case R.id.favorite:
                                 Toast.makeText(MainActivity.this, "SORRY, NOT IMPLEMENTED NOW", Toast.LENGTH_SHORT).show();
+                                loadFaforiteMoviesList();
+                                break;
                         }
                         return true;
                     }
@@ -175,6 +180,30 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
 
             }
         });
+    }
+
+    /**
+     * load favorite movies from database
+     */
+    private void loadFaforiteMoviesList(){
+        progressBarLoadMovies.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.INVISIBLE);
+        MovieDatabase mDb = MovieDatabase.getMovieDatabase(MainActivity.this);
+        List<MovieInfo> movieInfoFavorite = mDb.movieInfoDao().getAllMovies();
+        listMovies = new ArrayList<>();
+        //convert movieInfo from db to listMovies
+        for(MovieInfo movieInfo: movieInfoFavorite){
+            Result result = new Result();
+            result.setId(movieInfo.getId());
+            result.setOverview(movieInfo.getOverview());
+            result.setPosterPath(movieInfo.getPosterPath());
+            result.setReleaseDate(movieInfo.getRelease_date());
+            result.setTitle(movieInfo.getTitle());
+            result.setVoteAverage(movieInfo.getRating());
+            result.setBackdropPath(movieInfo.getBackdropPath());
+            listMovies.add(result);
+        }
+        setMovies(listMovies);
     }
 
     private void setMovies(ArrayList<Result> listMovies) {
