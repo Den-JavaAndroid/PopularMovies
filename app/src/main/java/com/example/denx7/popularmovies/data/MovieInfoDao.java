@@ -6,16 +6,17 @@ import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
+import android.database.Cursor;
 
 import java.util.List;
 
 @Dao
 public interface MovieInfoDao {
-    @Query("SELECT * FROM movieinfo")
-    List<MovieInfo> getAllMovies();
+    @Query("SELECT * FROM " + MovieInfo.TABLE_NAME)
+    Cursor getAllMovies();
 
-    @Query("SELECT * FROM movieinfo WHERE id = :movieId")
-    MovieInfo getMovieById(int movieId);
+    @Query("SELECT * FROM  " + MovieInfo.TABLE_NAME + " WHERE id = :movieId")
+    Cursor getMovieById(long movieId);
 
     @Insert
     void insertMovieInfo(MovieInfo movieInfo);
@@ -23,6 +24,6 @@ public interface MovieInfoDao {
     @Update
     void updateMovieInfo(MovieInfo movieInfo);
 
-    @Query("DELETE FROM MovieInfo WHERE id = :movieId")
-    void deleteMovieInfo(int movieId);
+    @Query("DELETE FROM " + MovieInfo.TABLE_NAME + " WHERE id = :movieId")
+    int deleteMovieInfo(long movieId);
 }

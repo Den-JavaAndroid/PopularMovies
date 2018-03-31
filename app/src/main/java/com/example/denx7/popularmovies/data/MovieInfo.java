@@ -5,9 +5,10 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.provider.BaseColumns;
 
-@Entity
+@Entity(tableName = MovieInfo.TABLE_NAME)
 public class MovieInfo {
 
+    public static final String TABLE_NAME = "movieInfo";
     @PrimaryKey
     private int id;
 

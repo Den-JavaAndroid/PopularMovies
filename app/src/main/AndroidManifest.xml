@@ -28,6 +28,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".settings.SettingsActivity"/>
         </activity>
+        <provider
+            android:authorities="com.example.dexn7.popularmovies.provider"
+            android:name=".provider.MovieInfoContentProvider"/>
+        
+        
     </application>
+    
 
 </manifest>

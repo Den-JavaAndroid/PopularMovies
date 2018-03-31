@@ -1,6 +1,7 @@
 package com.example.denx7.popularmovies;
 
 import android.arch.persistence.room.Room;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.ActionBar;
@@ -14,11 +15,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.example.denx7.popularmovies.data.MovieContract;
 import com.example.denx7.popularmovies.data.MovieDatabase;
 import com.example.denx7.popularmovies.data.MovieInfo;
 import com.example.denx7.popularmovies.model.movieinfo.Result;
 import com.example.denx7.popularmovies.model.reviews.Reviews;
 import com.example.denx7.popularmovies.model.videos.Videos;
+import com.example.denx7.popularmovies.provider.MovieInfoContentProvider;
 import com.example.denx7.popularmovies.retrofit.RestClient;
 import com.squareup.picasso.Picasso;
 
@@ -101,16 +104,18 @@ public class DetailMovieActivity extends AppCompatActivity implements VideosAdap
                 @Override
                 public void onClick(View v) {
                     if (isFavoriteMovie()) {
-                        mDb.movieInfoDao().deleteMovieInfo(movieInfo.getId());
+                        getContentResolver().delete(Uri.parse(MovieInfoContentProvider.URI_MOVIE + "/" + movieInfo.getId()), null, null);
                     } else {
-                        MovieInfo movieInfoData = new MovieInfo();
-                        movieInfoData.setId(movieInfo.getId());
-                        movieInfoData.setOverview(movieInfo.getOverview());
-                        movieInfoData.setRating(movieInfo.getVoteAverage());
-                        movieInfoData.setRelease_date(movieInfo.getReleaseDate());
-                        movieInfoData.setTitle(movieInfo.getTitle());
-                        movieInfoData.setPosterPath(movieInfo.getPosterPath());
-                        mDb.movieInfoDao().insertMovieInfo(movieInfoData);
+
+                        ContentValues movieInfoValues = new ContentValues();
+                        movieInfoValues.put(MovieContract.MovieEntry.MOVIE_ID, movieInfo.getId());
+                        movieInfoValues.put(MovieContract.MovieEntry.TITLE, movieInfo.getTitle());
+                        movieInfoValues.put(MovieContract.MovieEntry.RELEASE_DATE, movieInfo.getReleaseDate());
+                        movieInfoValues.put(MovieContract.MovieEntry.POSTER, movieInfo.getPosterPath());
+                        movieInfoValues.put(MovieContract.MovieEntry.RATING, movieInfo.getVoteAverage());
+                        movieInfoValues.put(MovieContract.MovieEntry.BACKDROP_POSTER, movieInfo.getBackdropPath());
+                        movieInfoValues.put(MovieContract.MovieEntry.OVERVIEW, movieInfo.getOverview());
+                        getContentResolver().insert(MovieInfoContentProvider.URI_MOVIE, movieInfoValues);
                     }
                 }
             });
@@ -129,7 +134,9 @@ public class DetailMovieActivity extends AppCompatActivity implements VideosAdap
     }
 
     private boolean isFavoriteMovie() {
-        return mDb.movieInfoDao().getMovieById(movieInfo.getId()) != null;
+        String[] selectionArgs = new String[]{String.valueOf(movieInfo.getId())};
+        return getContentResolver().query(MovieInfoContentProvider.URI_MOVIE, null,
+                MovieContract.MovieEntry.MOVIE_ID + "=?", selectionArgs, null).getCount() != 0;
     }
 
     @Override

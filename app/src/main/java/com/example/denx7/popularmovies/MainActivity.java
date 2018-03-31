@@ -2,12 +2,18 @@ package com.example.denx7.popularmovies;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
+import android.test.mock.MockContentProvider;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +24,7 @@ import com.example.denx7.popularmovies.data.MovieDatabase;
 import com.example.denx7.popularmovies.data.MovieInfo;
 import com.example.denx7.popularmovies.model.movieinfo.PopularMovies;
 import com.example.denx7.popularmovies.model.movieinfo.Result;
+import com.example.denx7.popularmovies.provider.MovieInfoContentProvider;
 import com.example.denx7.popularmovies.retrofit.RestClient;
 import com.example.denx7.popularmovies.settings.SettingsActivity;
 import com.example.denx7.popularmovies.utils.NetworkUtils;
@@ -31,7 +38,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements MoviesAdapter.ItemClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends AppCompatActivity implements MoviesAdapter.ItemClickListener,
+        SharedPreferences.OnSharedPreferenceChangeListener{
 
     private MoviesAdapter adapter;
     private RestClient restClient;
@@ -42,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
     ProgressBar progressBarLoadMovies;
     @BindView(R.id.navigation)
     BottomNavigationView bottomNavigationView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
                                 loadMoviesSortedByChoose(getString(R.string.popular));
                                 break;
                             case R.id.favorite:
-                                Toast.makeText(MainActivity.this, "SORRY, NOT IMPLEMENTED NOW", Toast.LENGTH_SHORT).show();
                                 loadFaforiteMoviesList();
                                 break;
                         }
@@ -130,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
         String sortBy = sharedPreferences.getString(getString(R.string.sort_by_key), getString(R.string.popular));
         if (sortBy.equals(getString(R.string.popular))) getPopularMovieList();
         if (sortBy.equals(getString(R.string.rating))) getTopRatedMovieList();
+        if (sortBy.equals(getString(R.string.favorite))) loadFaforiteMoviesList();
     }
 
     private void loadMoviesSortedByChoose(String sortBy) {
@@ -188,22 +197,25 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
     private void loadFaforiteMoviesList(){
         progressBarLoadMovies.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.INVISIBLE);
-        MovieDatabase mDb = MovieDatabase.getMovieDatabase(MainActivity.this);
-        List<MovieInfo> movieInfoFavorite = mDb.movieInfoDao().getAllMovies();
-        listMovies = new ArrayList<>();
-        //convert movieInfo from db to listMovies
-        for(MovieInfo movieInfo: movieInfoFavorite){
-            Result result = new Result();
-            result.setId(movieInfo.getId());
-            result.setOverview(movieInfo.getOverview());
-            result.setPosterPath(movieInfo.getPosterPath());
-            result.setReleaseDate(movieInfo.getRelease_date());
-            result.setTitle(movieInfo.getTitle());
-            result.setVoteAverage(movieInfo.getRating());
-            result.setBackdropPath(movieInfo.getBackdropPath());
-            listMovies.add(result);
+        Cursor data = getContentResolver().query(MovieInfoContentProvider.URI_MOVIE, null, null, null,null);
+        if(data.getCount() != 0){
+            listMovies = new ArrayList<>();
+            while (data.moveToNext()){
+                Result result = new Result();
+                result.setId(data.getInt(0));
+                result.setOriginalTitle(data.getString(1));
+                result.setReleaseDate(data.getString(2));
+                result.setPosterPath(data.getString(3));
+                result.setVoteAverage(data.getDouble(4));
+                result.setBackdropPath(data.getString(5));
+                result.setOverview(data.getString(6));
+                listMovies.add(result);
+            }
+            setMovies(listMovies);
+
+        } else {
+            Toast.makeText(MainActivity.this, "No favorite movies", Toast.LENGTH_SHORT).show();
         }
-        setMovies(listMovies);
     }
 
     private void setMovies(ArrayList<Result> listMovies) {
@@ -233,13 +245,5 @@ public class MainActivity extends AppCompatActivity implements MoviesAdapter.Ite
             loadMoviesSortedByPreference(sharedPreferences);
         }
 
-    }
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .unregisterOnSharedPreferenceChangeListener(this);
     }
 }
